@@ -97,9 +97,14 @@ void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
 void ChangeZoom(ImageState* state, double zoom, int steps)
 {
     // TODO
+    double zst = pow(zoom , 1./steps) ; // zoom step
+    //printf("ZST : %lf\n" , zst) ; 
     for(int i=0; i<steps; i++)
     {
-        // TODO
+        state->minx = state->minx / zst ;  
+        state->miny = state->miny / zst ; 
+        state->maxx = state->maxx / zst ; 
+        state->maxy = state->maxy / zst ; 
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
