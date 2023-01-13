@@ -55,19 +55,31 @@ void UpdateImageData(ImageState* state)
             // dx,dy => rx, ry
             // rx = nx * cos(state->angle) + ny * sin(state->angle);
             // ry = -nx * sin(state->angle) + ny * cos(state->angle);
-            int rx = x , ry = y ; 
+            //RE_START + (x / WIDTH) * (RE_END - RE_START)
+            double rx = (double)state->minx + (x / (double)(state->width) ) * (double)(state->maxx - state->minx)
+             , ry = (double)state->miny + (y / (double)(state->height) ) * (double)(state->maxx - state->miny) ; 
             int iter = get_mbs_iter(rx, ry);
            // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
-            state->bmFileData.bmData[y * state->width + x] = iter;
+            if(iter < 60)
+            state->bmFileData.bmData[y * state->width + x] = 0;
+            else 
+            state->bmFileData.bmData[y * state->width + x] = 1;
+
+            //printf("iter : %d\n" , iter ) ; 
+           // printf("x : %d , y: %d" , x , y) ; 
         }
     }
-    for(int i=0; i<256; i++)
+
+    // I just set i = 2 fixed later  
+    for(int i=2; i<256; i++)
     {
         //int hue = (int) ((i / 255)/360);
         //printf("%d" , hue) ; 
         // HSV2RGB(hue, 100, 100, &(state->bmFileData.bmHeader.colorIdx[i]));
-        state->bmFileData.bmHeader.colorIdx[i].r = 255 ; 
+        state->bmFileData.bmHeader.colorIdx[i].r = i % 80 ; 
     }
+    state->bmFileData.bmHeader.colorIdx[0].r = 255 ; 
+    state->bmFileData.bmHeader.colorIdx[1].b = 255 ;
 }
 
 void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)

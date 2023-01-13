@@ -12,11 +12,13 @@ int main(int argc, char** argv)
 
     printf("processing ARGS") ; 
     
+    state.width = cfg.width ; 
+    state.height = cfg.height ; 
+
     ProcessArgs(argc, argv, &cfg, &state);
     
     printf("Args procceed") ; 
-    state.width = cfg.width ; 
-    state.height = cfg.height ; 
+    
     UpdateImageData(&state);
     WriteBitmapFile(state.image_count++, & state.bmFileData);
 

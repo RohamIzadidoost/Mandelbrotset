@@ -49,6 +49,7 @@ typedef struct tagBitMapFile {
 
 void InitImage(BitMapFile* pbmFile, int height, int width)
 {
+    printf("INITING IMAGE , width : %d " , width) ; 
     unsigned int headerSize = 
         sizeof(BITMAPFILEHEADER) + 
         sizeof(BITMAPINFOHEADER) + 

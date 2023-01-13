@@ -31,13 +31,15 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
         &(state->miny),
         &(state->maxy)
     );
-
+    state->width = outcfg->width ; 
+    state->height = outcfg->height ; 
     printf("\nminx, maxy:%lf %lf" , state->minx , state-> maxy) ; 
     /*
     Cmd Commands[100];
     int cmdno = 0;
     while(true)
     {
+        printf("cmdno : %d" , cmdno) ; 
         char cmdname[10];
         int ret = fscanf("%s ", cmdname);
         if (ret <= 0)
@@ -64,7 +66,8 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
         }
         cmdno++;
     }
-
+    printf("GOT the inputs\n") ; 
+    
     outcfg->CmdCount = cmdno;
     outcfg->Commands = (Cmd*) malloc(sizeof(Cmd) * cmdno);
     for(int i=0; i<cmdno; i++)
