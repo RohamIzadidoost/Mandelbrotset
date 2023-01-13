@@ -33,39 +33,48 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
     );
     state->width = outcfg->width ; 
     state->height = outcfg->height ; 
-    printf("\nminx, maxy:%lf %lf" , state->minx , state-> maxy) ; 
-    /*
+    printf("\nminx, maxy:%lf %lf\n" , state->minx , state-> maxy) ; 
+    
     Cmd Commands[100];
     int cmdno = 0;
+    
     while(true)
     {
-        printf("cmdno : %d" , cmdno) ; 
+        printf("cmdno : %d\n" , cmdno) ; 
         char cmdname[10];
-        int ret = fscanf("%s ", cmdname);
+        int ret = 0 ; 
+        ret = fscanf(fp , "%s ", cmdname);
+        printf("command was : %s \n" , cmdname) ; 
         if (ret <= 0)
             break;
-        if ( strcmp(cmdname, "zoom") )
+        if ( strcmp(cmdname, "zoom") == 0 )
         {
             Commands[cmdno].cmd = ct_Zoom;
-            fscanf("%lf%*c%d ", &(Commands[cmdno].zoom), &(Commands[cmdno].steps));
+            fscanf(fp , "%lf%*c%d ", &(Commands[cmdno].zoom), &(Commands[cmdno].steps));
         }
-        else if (strcmp(cmdname, "rotate"))
+        else if (strcmp(cmdname, "rotate") == 0)
         {
             Commands[cmdno].cmd = ct_Rotate;
-            fscanf("%lf%*c%d ", &(Commands[cmdno].angle), &(Commands[cmdno].steps));
+            fscanf(fp , "%lf%*c%d ", &(Commands[cmdno].angle), &(Commands[cmdno].steps));
         }
-        else if (strcmp(cmdname, "center"))
+        else if (strcmp(cmdname, "center") == 0)
         {
             Commands[cmdno].cmd = ct_Center;
-            fscanf("%lf%*c%lf%*c%d ", &(Commands[cmdno].cx),  &(Commands[cmdno].cy), &(Commands[cmdno].steps));
+            fscanf(fp , "%lf%*c%lf%*c%d ", &(Commands[cmdno].cx),  &(Commands[cmdno].cy), &(Commands[cmdno].steps));
         }
-        else if (strcmp(cmdname, "hold"))
+        else if (strcmp(cmdname, "hold") == 0)
         {
             Commands[cmdno].cmd = ct_Hold;
-            fscanf("%*c%d ", &(Commands[cmdno].steps));
+            
+            //printf("WAS HOLD and %d \n " ,Commands[cmdno].cmd ) ; 
+            
+            fscanf(fp , "%d ", &(Commands[cmdno].steps));
         }
+        //printf("Done and cfg type is %d , %d \n " ,strcmp(cmdname, "hold") , strcmp(cmdname, "rotate") ) ; 
         cmdno++;
     }
+    
+
     printf("GOT the inputs\n") ; 
     
     outcfg->CmdCount = cmdno;
@@ -73,7 +82,9 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
     for(int i=0; i<cmdno; i++)
     {
         outcfg->Commands[i] = Commands[i];
-    }*/
+        printf("outcfg command %d: is %d \n" , i , Commands[i].cmd) ; 
+    }
+    printf("%d , %d " , ct_Center , ct_Rotate) ; 
     // TODO    
     InitImage(& state->bmFileData, state->height, state->width);
     

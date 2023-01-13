@@ -46,7 +46,7 @@ void hsv_to_rgb(int hue, int min, int max, COLORINDEX* p)
 
 void UpdateImageData(ImageState* state)
 {
-    printf("UPDING IMAGE DATA\n %d , %d" , state->width , state->height) ; 
+    printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
@@ -119,6 +119,7 @@ void ChangeRotation(ImageState* state, double angle, int steps)
 
 void Hold(ImageState* state, int steps)
 {
+    printf("HOLDING FOR %d \n" , steps) ; 
     // TODO
     for(int i=0; i<steps; i++)
     {

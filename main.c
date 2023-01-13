@@ -17,13 +17,14 @@ int main(int argc, char** argv)
 
     ProcessArgs(argc, argv, &cfg, &state);
     
-    printf("Args procceed") ; 
+    printf("Args procceed!!!!\n") ; 
     
     UpdateImageData(&state);
     WriteBitmapFile(state.image_count++, & state.bmFileData);
 
     for(int i=0;i<cfg.CmdCount; i++)
     {
+        printf("IN COMMAND %d: type = %d \n" ,i ,  cfg.Commands[i].cmd) ; 
         switch (cfg.Commands[i].cmd)
         {
             case ct_Center:
