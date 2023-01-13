@@ -33,6 +33,8 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
     );
     state->width = outcfg->width ; 
     state->height = outcfg->height ; 
+    state->cx = (state->minx + state->maxx)/2.0 ; 
+    state->cy = (state->miny + state->maxy)/2.0 ;
     printf("\nminx, maxy:%lf %lf\n" , state->minx , state-> maxy) ; 
     
     Cmd Commands[100];

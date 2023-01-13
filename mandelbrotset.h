@@ -85,10 +85,17 @@ void UpdateImageData(ImageState* state)
 void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
 {
     // TODO
-
+    double xst = (newcx - state->cx) / (double)(steps) ; 
+    double yst = (newcy - state->cy) / (double)(steps) ; 
     for(int i=0;i<steps; i++)
     {
         // TODO
+        state->cx += xst ; 
+        state->cy += yst ; 
+        state->minx += xst ; 
+        state->maxx += xst ; 
+        state->miny += yst ; 
+        state->maxy += yst; 
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
