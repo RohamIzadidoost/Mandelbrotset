@@ -3,7 +3,7 @@
 #include"defs.h"
 #include"utils.h"
 #include"mandelbrotset.h"
-
+#define PI 3.14159265
 int main(int argc, char** argv)
 {
     printf("Be name khoda") ; 
@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     
     state.width = cfg.width ; 
     state.height = cfg.height ; 
-
+    state.angle = 0 ; 
     ProcessArgs(argc, argv, &cfg, &state);
     
     printf("Args procceed!!!!\n") ; 

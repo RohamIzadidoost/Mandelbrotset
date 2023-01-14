@@ -3,7 +3,7 @@
 
 #include"defs.h"
 #include<math.h>
-
+const double PI=  3.14159265/180.0;
 const int MAX_ITER = 80 ; 
 
 typedef struct _complex
@@ -56,9 +56,18 @@ void UpdateImageData(ImageState* state)
             // rx = nx * cos(state->angle) + ny * sin(state->angle);
             // ry = -nx * sin(state->angle) + ny * cos(state->angle);
             //RE_START + (x / WIDTH) * (RE_END - RE_START)
+            /* 
             double rx = (double)state->minx + (x / (double)(state->width) ) * (double)(state->maxx - state->minx)
              , ry = (double)state->miny + (y / (double)(state->height) ) * (double)(state->maxx - state->miny) ; 
-            int iter = get_mbs_iter(rx, ry);
+            double nx = cos(state->angle) * rx - sin(state->angle) * ry ; 
+            double ny = sin(state->angle) * rx + cos(state->angle) * ry ; 
+            */
+            double nx = (double)state->minx + (x / (double)(state->width) ) * (double)(state->maxx - state->minx)
+             , ny = (double)state->miny + (y / (double)(state->height) ) * (double)(state->maxx - state->miny) ; 
+            double rx = nx * cos(PI * state->angle) + ny * sin(PI * state->angle);
+            double ry = -nx * sin(PI * state->angle) + ny * cos(PI * state->angle); 
+            
+            int iter = get_mbs_iter(rx , ry);
            // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
             if(iter < 60)
             state->bmFileData.bmData[y * state->width + x] = 0;
@@ -121,6 +130,7 @@ void ChangeRotation(ImageState* state, double angle, int steps)
 {
     // TODO
     double angle_step = angle / steps;
+    printf("%lf\n" , angle_step) ; 
     for(int i=0; i<steps; i++)
     {
         state->angle += angle_step;
