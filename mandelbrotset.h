@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-const int MAX_ITER = 80 ; 
+const int MAX_ITER = 256; 
 
 typedef struct _complex
 {
@@ -17,6 +17,7 @@ complex mul(complex a , complex b){
     res.I = a.I * b.R + a.R * b.I ; 
     return res ; 
 }
+//printf("I am Sareh");
 
 complex sum(complex a , complex b){
     complex res = {a.R + b.R , a.I + b.I} ; 
@@ -27,7 +28,7 @@ double ABS(complex a){
     return sqrt(a.R * a.R + a.I * a.I) ; 
 }
 
-int get_mbs_iter(double x, double y)
+double get_mbs_iter(double x, double y)
 {
     int res = 0 ;
     complex c = {x , y} ; 
@@ -36,17 +37,48 @@ int get_mbs_iter(double x, double y)
         res ++ ; 
         z = sum(mul(z , z) , c ) ; 
     }
-    return res ; 
+    if(res == MAX_ITER + 1) return res ; 
+    return (double)res - log(log2(ABS(z))); //log(log2(abs(z)
 }
 
-void hsv_to_rgb(int hue, int min, int max, COLORINDEX* p)
+void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 {
-    //todo
+    float s = S/100.0;
+    float v = V/100.0;
+    float C = s*v;
+    float X = C*(1-fabs(fmod(H/60.0, 2)-1));
+    float m = v-C;
+    float r,g,b;
+    if(H >= 0 && H < 60){
+        r = C,g = X,b = 0;
+    }
+    else if(H >= 60 && H < 120){
+        r = X,g = C,b = 0;
+    }
+    else if(H >= 120 && H < 180){
+        r = 0,g = C,b = X;
+    }
+    else if(H >= 180 && H < 240){
+        r = 0,g = X,b = C;
+    }
+    else if(H >= 240 && H < 300){
+        r = X,g = 0,b = C;
+    }
+    else{
+        r = C,g = 0,b = X;
+    }
+    int R = (r+m)*255;
+    int G = (g+m)*255;
+    int B = (b+m)*255;
+    //printf("RGB : %d , %d , %d \n" , R , G , B) ; 
+    p->b = R ; // why it creates a good pic ?
+    p->b = B ; 
+    p->g = G ; 
 }
 
 void UpdateImageData(ImageState* state)
 {
-    printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
+    //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
@@ -67,12 +99,14 @@ void UpdateImageData(ImageState* state)
             double rx = nx * cos(PI * state->angle) + ny * sin(PI * state->angle);
             double ry = -nx * sin(PI * state->angle) + ny * cos(PI * state->angle); 
             
-            int iter = get_mbs_iter(rx , ry);
+            double iter = get_mbs_iter(rx , ry);
            // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
-            if(iter < 60)
+            if(iter == MAX_ITER + 1)
             state->bmFileData.bmData[y * state->width + x] = 0;
             else 
-            state->bmFileData.bmData[y * state->width + x] = 1;
+            state->bmFileData.bmData[y * state->width + x] = iter;
+            
+           // printf("iter: %lf\n" , iter) ; 
 
             //printf("iter : %d\n" , iter ) ; 
            // printf("x : %d , y: %d" , x , y) ; 
@@ -80,15 +114,20 @@ void UpdateImageData(ImageState* state)
     }
 
     // I just set i = 2 fixed later  
-    for(int i=2; i<256; i++)
+    for(int i=0; i<256; i++)
     {
-        //int hue = (int) ((i / 255)/360);
+        double hue = (int) ((i / 255)/360);
+        hue = (double)(i)/255.0 * 360.0 ; 
         //printf("%d" , hue) ; 
-        // HSV2RGB(hue, 100, 100, &(state->bmFileData.bmHeader.colorIdx[i]));
-        state->bmFileData.bmHeader.colorIdx[i].r = i % 80 ; 
+        hsv_to_rgb(hue, 100, 100, &(state->bmFileData.bmHeader.colorIdx[i])); 
+        //printf("i:%d R:%d , G:%d , B:%d \n" , i , state->bmFileData.bmHeader.colorIdx[i].r , 
+       //state->bmFileData.bmHeader.colorIdx[i].g , state->bmFileData.bmHeader.colorIdx[i].b) ; 
     }
-    state->bmFileData.bmHeader.colorIdx[0].r = 255 ; 
-    state->bmFileData.bmHeader.colorIdx[1].b = 255 ;
+    state->bmFileData.bmHeader.bmInfoHeader.biClrUsed = 100;
+    state->bmFileData.bmHeader.bmInfoHeader.biClrImportant = 100;
+    state->bmFileData.bmHeader.colorIdx[0].r = 0 ; 
+    state->bmFileData.bmHeader.colorIdx[0].b = 0 ;
+    state->bmFileData.bmHeader.colorIdx[0].g = 0 ;
 }
 
 void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
