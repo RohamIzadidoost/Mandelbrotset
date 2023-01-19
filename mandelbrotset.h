@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-const int MAX_ITER = 256; 
+int MAX_ITER = 100; 
 
 typedef struct _complex
 {
@@ -24,8 +24,8 @@ complex sum(complex a , complex b){
     return res ; 
 }
 
-double ABS(complex a){
-    return sqrt(a.R * a.R + a.I * a.I) ; 
+double ABS(complex* a){
+    return sqrt(a->R * a->R + a->I * a->I) ; 
 }
 
 double get_mbs_iter(double x, double y)
@@ -33,12 +33,12 @@ double get_mbs_iter(double x, double y)
     int res = 0 ;
     complex c = {x , y} ; 
     complex z = {0 , 0} ;  
-    while(res <= MAX_ITER && ABS(z) <= 2){
+    while(res <= MAX_ITER && ABS(&z) <= 2){
         res ++ ; 
         z = sum(mul(z , z) , c ) ; 
     }
     if(res == MAX_ITER + 1) return res ; 
-    return (double)res - log(log2(ABS(z))); //log(log2(abs(z)
+    return (double)res - log(log2(ABS(&z))); //log(log2(abs(z)
 }
 
 void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
@@ -78,6 +78,7 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 
 void UpdateImageData(ImageState* state)
 {
+    printf("CREATING pic:%d\n" , state->image_count);
     //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
