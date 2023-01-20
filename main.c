@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
     printf("processing ARGS") ; 
     
-    state.width = cfg.width ; 
+    state.width = cfg.width ;
     state.height = cfg.height ; 
     state.angle = 0 ; 
     ProcessArgs(argc, argv, &cfg, &state);

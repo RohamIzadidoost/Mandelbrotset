@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-int MAX_ITER = 100; 
+int MAX_ITER = 1000; 
 
 typedef struct _complex
 {
@@ -33,6 +33,8 @@ double get_mbs_iter(double x, double y)
     int res = 0 ;
     complex c = {x , y} ; 
     complex z = {0 , 0} ;  
+    // complex c = {-0.835 , 0.232} ; 
+    // complex z = {x , y} ; 
     while(res <= MAX_ITER && ABS(&z) <= 2){
         res ++ ; 
         z = sum(mul(z , z) , c ) ; 
@@ -78,25 +80,15 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 
 void UpdateImageData(ImageState* state)
 {
-    printf("CREATING pic:%d\n" , state->image_count);
+    printf("CREATING pic:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf\n" , state->image_count , state->cx , state->cy,
+    state->minx , state->maxx , state->miny , state->maxy);
     //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
         {
-            // x,y => dx,dy
-            // dx,dy => rx, ry
-            // rx = nx * cos(state->angle) + ny * sin(state->angle);
-            // ry = -nx * sin(state->angle) + ny * cos(state->angle);
-            //RE_START + (x / WIDTH) * (RE_END - RE_START)
-            /* 
-            double rx = (double)state->minx + (x / (double)(state->width) ) * (double)(state->maxx - state->minx)
-             , ry = (double)state->miny + (y / (double)(state->height) ) * (double)(state->maxx - state->miny) ; 
-            double nx = cos(state->angle) * rx - sin(state->angle) * ry ; 
-            double ny = sin(state->angle) * rx + cos(state->angle) * ry ; 
-            */
-            double nx = (double)state->minx + (x / (double)(state->width) ) * (double)(state->maxx - state->minx)
-             , ny = (double)state->miny + (y / (double)(state->height) ) * (double)(state->maxx - state->miny) ; 
+            double nx = (double)state->minx + ((double)x / (double)(state->width) ) * (double)(state->maxx - state->minx)
+             , ny = (double)state->miny + ((double)y / (double)(state->height) ) * (double)(state->maxy - state->miny) ; 
             double rx = nx * cos(PI * state->angle) + ny * sin(PI * state->angle);
             double ry = -nx * sin(PI * state->angle) + ny * cos(PI * state->angle); 
             
@@ -105,7 +97,7 @@ void UpdateImageData(ImageState* state)
             if(iter == MAX_ITER + 1)
             state->bmFileData.bmData[y * state->width + x] = 0;
             else 
-            state->bmFileData.bmData[y * state->width + x] = iter;
+            state->bmFileData.bmData[y * state->width + x] = iter/MAX_ITER * 256.0;
             
            // printf("iter: %lf\n" , iter) ; 
 
@@ -134,8 +126,8 @@ void UpdateImageData(ImageState* state)
 void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
 {
     // TODO
-    double xst = (newcx - state->cx) / (double)(steps) ; 
-    double yst = (newcy - state->cy) / (double)(steps) ; 
+    double xst = (double)(newcx - state->cx) / (double)(steps) ; 
+    double yst = (double)(newcy - state->cy) / (double)(steps) ; 
     for(int i=0;i<steps; i++)
     {
         // TODO
@@ -154,13 +146,23 @@ void ChangeZoom(ImageState* state, double zoom, int steps)
 {
     // TODO
     double zst = pow(zoom , 1./steps) ; // zoom step
-    //printf("ZST : %lf\n" , zst) ; 
+    printf("ZST : %lf\n" , zst) ; 
     for(int i=0; i<steps; i++)
     {
-        state->minx = state->minx / zst ;  
-        state->miny = state->miny / zst ; 
-        state->maxx = state->maxx / zst ; 
-        state->maxy = state->maxy / zst ; 
+        // state->minx = state->minx / zst ;  
+        // state->miny = state->miny / zst ; 
+        // state->maxx = state->maxx / zst ; 
+        // state->maxy = state->maxy / zst ; 
+        // state->cx = state->cx / zst ; 
+        // state->cy = state->cy / zst ; 
+        double flx = state->maxx - state->minx ; //first len x 
+        double fly = state->maxy - state->miny ; 
+        double dx = flx - flx / zst; // delta x
+        double dy = fly - fly / zst;
+        state->minx = state->minx + dx/2 ;  
+        state->miny = state->miny + dy/2 ; 
+        state->maxx = state->maxx - dx/2 ; 
+        state->maxy = state->maxy - dy/2 ;
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
