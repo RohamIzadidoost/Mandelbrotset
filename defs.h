@@ -7,7 +7,9 @@ typedef enum
     ct_Center = 1,
     ct_Zoom = 2,
     ct_Rotate = 3,
-    ct_Hold = 4
+    ct_Hold = 4,
+    ct_Julia = 5 , 
+    ct_ZoomJul = 6
 } cmd_type;
 
 
@@ -18,6 +20,7 @@ typedef struct _cmd
     double cx,cy;
     double zoom;
     double angle;
+    double rconst , iconst ; 
 } Cmd;
 
 

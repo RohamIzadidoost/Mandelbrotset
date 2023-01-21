@@ -72,6 +72,17 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
             
             fscanf(fp , "%d ", &(Commands[cmdno].steps));
         }
+        else if (strcmp(cmdname , "julia") == 0)
+        {
+            Commands[cmdno].cmd = ct_Julia;
+            fscanf(fp , "%lf%*c%lf%*c%d ", &(Commands[cmdno].rconst),  &(Commands[cmdno].iconst), &(Commands[cmdno].steps));
+        }
+        else if (strcmp(cmdname , "ZoomJul") == 0)
+        {
+            Commands[cmdno].cmd = ct_ZoomJul;
+            fscanf(fp , "%lf%*c%lf%*c%lf%*c%d ", &(Commands[cmdno].rconst),  &(Commands[cmdno].iconst)
+            , &(Commands[cmdno].zoom) , &(Commands[cmdno].steps));
+        }
         //printf("Done and cfg type is %d , %d \n " ,strcmp(cmdname, "hold") , strcmp(cmdname, "rotate") ) ; 
         cmdno++;
     }

@@ -42,6 +42,11 @@ int main(int argc, char** argv)
             case ct_Hold:
                 Hold(&state, cfg.Commands[i].steps);
                 break;
+            case ct_Julia:
+                BuildJulia(&state , cfg.Commands[i].rconst , cfg.Commands[i].iconst , cfg.Commands[i].steps);
+                break;;
+            case ct_ZoomJul:
+                ZoomJul(&state , cfg.Commands[i].rconst , cfg.Commands[i].iconst , cfg.Commands[i].zoom , cfg.Commands[i].steps);
 
         }
     }

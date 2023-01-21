@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-int MAX_ITER = 1000; 
+int MAX_ITER = 200; 
 
 typedef struct _complex
 {
@@ -28,13 +28,26 @@ double ABS(complex* a){
     return sqrt(a->R * a->R + a->I * a->I) ; 
 }
 
+// complex julia_begin_const = {-0.835 , 0.232} ; 
+complex julia_begin_const = {0 , 0} ;
+bool JULIA = false ;
+
+
 double get_mbs_iter(double x, double y)
 {
     int res = 0 ;
-    complex c = {x , y} ; 
-    complex z = {0 , 0} ;  
-    // complex c = {-0.835 , 0.232} ; 
-    // complex z = {x , y} ; 
+    // complex c = {x , y} ; 
+    // complex z = {0 , 0} ;  
+    complex c;
+    complex z = {x , y} ;  
+    if(JULIA){
+        c = julia_begin_const ; 
+        //z = (complex){x , y} ;
+    }else{
+        c = (complex){x , y} ; 
+        //z = (complex){x , y} ;      
+    }
+     
     while(res <= MAX_ITER && ABS(&z) <= 2){
         res ++ ; 
         z = sum(mul(z , z) , c ) ; 
@@ -123,25 +136,21 @@ void UpdateImageData(ImageState* state)
     state->bmFileData.bmHeader.colorIdx[0].g = 0 ;
 }
 
-void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
+void BuildJulia(ImageState* state, double NewRconst, double NewIconst, int steps)
 {
     // TODO
-    double xst = (double)(newcx - state->cx) / (double)(steps) ; 
-    double yst = (double)(newcy - state->cy) / (double)(steps) ; 
+    JULIA ^= 1 ;
+    double Rst = (double)(NewRconst - julia_begin_const.R) / (double)(steps) ; 
+    double Ist = (double)(NewIconst - julia_begin_const.I) / (double)(steps) ; 
     for(int i=0;i<steps; i++)
     {
         // TODO
-        state->cx += xst ; 
-        state->cy += yst ; 
-        state->minx += xst ; 
-        state->maxx += xst ; 
-        state->miny += yst ; 
-        state->maxy += yst; 
+        julia_begin_const.I += Ist ; 
+        julia_begin_const.R += Rst ;  
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
 }
-
 void ChangeZoom(ImageState* state, double zoom, int steps)
 {
     // TODO
@@ -163,6 +172,48 @@ void ChangeZoom(ImageState* state, double zoom, int steps)
         state->miny = state->miny + dy/2 ; 
         state->maxx = state->maxx - dx/2 ; 
         state->maxy = state->maxy - dy/2 ;
+        UpdateImageData(state);
+        WriteBitmapFile(state->image_count++, & state->bmFileData);
+    }
+}
+void ZoomJul(ImageState* state, double NewRconst, double NewIconst ,double zoom, int steps ){
+    printf("ZOOMJULING : %lf , %lf , %lf , %d : \n" , NewRconst , NewIconst , zoom , steps) ; 
+    JULIA = 1 ; 
+    double Rst = (double)(NewRconst - julia_begin_const.R) / (double)(steps) ; 
+    double Ist = (double)(NewIconst - julia_begin_const.I) / (double)(steps) ; 
+    double zst = pow(zoom , 1./steps) ;
+    for(int i=0;i<steps; i++)
+    {
+        // TODO
+        julia_begin_const.I += Ist ; 
+        julia_begin_const.R += Rst ;  
+        double flx = state->maxx - state->minx ; //first len x 
+        double fly = state->maxy - state->miny ; 
+        double dx = flx - flx / zst; // delta x
+        double dy = fly - fly / zst;
+        state->minx = state->minx + dx/2 ;  
+        state->miny = state->miny + dy/2 ; 
+        state->maxx = state->maxx - dx/2 ; 
+        state->maxy = state->maxy - dy/2 ;
+        UpdateImageData(state);
+        WriteBitmapFile(state->image_count++, & state->bmFileData);
+    }
+}
+
+void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
+{
+    // TODO
+    double xst = (double)(newcx - state->cx) / (double)(steps) ; 
+    double yst = (double)(newcy - state->cy) / (double)(steps) ; 
+    for(int i=0;i<steps; i++)
+    {
+        // TODO
+        state->cx += xst ; 
+        state->cy += yst ; 
+        state->minx += xst ; 
+        state->maxx += xst ; 
+        state->miny += yst ; 
+        state->maxy += yst; 
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
