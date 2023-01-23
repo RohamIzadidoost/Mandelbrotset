@@ -95,10 +95,10 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 void UpdateImageData(ImageState* state)
 {
     if(state -> colgoal != state->colval){
-        state->colval -= state -> colstep ; 
+        state->colval += state ->colstep; 
     }
-    printf("CREATING pic:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf\n" , state->image_count , state->cx , state->cy,
-    state->minx , state->maxx , state->miny , state->maxy);
+    printf("CREATING pic:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf , COlval: %lf\n" , state->image_count , state->cx , state->cy,
+    state->minx , state->maxx , state->miny , state->maxy , state -> colval);
     //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
