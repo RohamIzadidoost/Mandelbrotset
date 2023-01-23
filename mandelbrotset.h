@@ -58,6 +58,7 @@ double get_mbs_iter(double x, double y)
 
 void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 {
+    printf("%lf\n" , H) ; 
     float s = S/100.0;
     float v = V/100.0;
     float C = s*v;
