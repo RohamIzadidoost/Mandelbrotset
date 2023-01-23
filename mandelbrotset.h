@@ -58,7 +58,7 @@ double get_mbs_iter(double x, double y)
 
 void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 {
-    printf("%lf\n" , H) ; 
+    //printf("%lf\n" , H) ; 
     float s = S/100.0;
     float v = V/100.0;
     float C = s*v;
@@ -94,6 +94,9 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
 
 void UpdateImageData(ImageState* state)
 {
+    if(state -> colgoal != state->colval){
+        state->colval -= state -> colstep ; 
+    }
     printf("CREATING pic:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf\n" , state->image_count , state->cx , state->cy,
     state->minx , state->maxx , state->miny , state->maxy);
     //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
@@ -108,7 +111,7 @@ void UpdateImageData(ImageState* state)
             
             double iter = get_mbs_iter(rx , ry);
            // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
-            if(iter == MAX_ITER + 1)
+            if(iter == MAX_ITER + 1 || iter <= 2)
             state->bmFileData.bmData[y * state->width + x] = 0;
             else 
             state->bmFileData.bmData[y * state->width + x] = iter/MAX_ITER * 256.0;
@@ -125,8 +128,10 @@ void UpdateImageData(ImageState* state)
     {
         double hue = (int) ((i / 255)/360);
         hue = (double)(i)/255.0 * 360.0 ; 
-        //printf("%d" , hue) ; 
-        hsv_to_rgb(hue, 100, 100, &(state->bmFileData.bmHeader.colorIdx[i])); 
+        //printf("%d" , hue) ;
+        int H = ((int)hue + 200) % 360 ; 
+        int Hint = (int) hue ; 
+        hsv_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
         //printf("i:%d R:%d , G:%d , B:%d \n" , i , state->bmFileData.bmHeader.colorIdx[i].r , 
        //state->bmFileData.bmHeader.colorIdx[i].g , state->bmFileData.bmHeader.colorIdx[i].b) ; 
     }
@@ -136,7 +141,12 @@ void UpdateImageData(ImageState* state)
     state->bmFileData.bmHeader.colorIdx[0].b = 0 ;
     state->bmFileData.bmHeader.colorIdx[0].g = 0 ;
 }
-
+void ChangeColVal(ImageState* state, double goal, int steps)
+{
+    state -> colgoal = goal ; 
+    state -> colstep = goal - state->colval ; 
+    state -> colstep /= steps ; 
+}
 void BuildJulia(ImageState* state, double NewRconst, double NewIconst, int steps)
 {
     // TODO

@@ -9,7 +9,8 @@ typedef enum
     ct_Rotate = 3,
     ct_Hold = 4,
     ct_Julia = 5 , 
-    ct_ZoomJul = 6
+    ct_ZoomJul = 6,
+    ct_ColVal = 7
 } cmd_type;
 
 
@@ -21,6 +22,7 @@ typedef struct _cmd
     double zoom;
     double angle;
     double rconst , iconst ; 
+    double colgoal ; 
 } Cmd;
 
 
@@ -40,6 +42,9 @@ typedef struct _image_state
     double angle;
     int height, width;
     int image_count;
+    float colval ;
+    float colgoal ; 
+    float colstep; 
     BitMapFile bmFileData;
 } ImageState;
 #endif

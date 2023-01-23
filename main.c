@@ -15,6 +15,10 @@ int main(int argc, char** argv)
     state.width = cfg.width ;
     state.height = cfg.height ; 
     state.angle = 0 ; 
+    state.colgoal = 100 ; 
+    state.colval = 100 ; 
+    state.colstep = 0 ; 
+
     ProcessArgs(argc, argv, &cfg, &state);
     
     printf("Args procceed!!!!\n") ; 
@@ -47,6 +51,8 @@ int main(int argc, char** argv)
                 break;;
             case ct_ZoomJul:
                 ZoomJul(&state , cfg.Commands[i].rconst , cfg.Commands[i].iconst , cfg.Commands[i].zoom , cfg.Commands[i].steps);
+            case ct_ColVal:
+                ChangeColVal(&state , cfg.Commands[i].colgoal , cfg.Commands[i].steps) ; 
 
         }
     }

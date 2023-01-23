@@ -83,6 +83,11 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
             fscanf(fp , "%lf%*c%lf%*c%lf%*c%d ", &(Commands[cmdno].rconst),  &(Commands[cmdno].iconst)
             , &(Commands[cmdno].zoom) , &(Commands[cmdno].steps));
         }
+        else if (strcmp(cmdname , "ChangeColVal") == 0)
+        {
+            Commands[cmdno].cmd = ct_ColVal ;
+            fscanf(fp , "%lf%*c%d ", &(Commands[cmdno].colgoal), &(Commands[cmdno].steps));
+        }
         //printf("Done and cfg type is %d , %d \n " ,strcmp(cmdname, "hold") , strcmp(cmdname, "rotate") ) ; 
         cmdno++;
     }
