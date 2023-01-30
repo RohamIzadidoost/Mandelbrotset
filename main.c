@@ -50,9 +50,13 @@ int main(int argc, char** argv)
                 BuildJulia(&state , cfg.Commands[i].rconst , cfg.Commands[i].iconst , cfg.Commands[i].steps);
                 break;;
             case ct_ZoomJul:
+                printf("COlval: %lf , ColGoal: %lf ,Colstep: %lf\n" ,
+                 state.colval , state.colgoal , state.colstep);
                 ZoomJul(&state , cfg.Commands[i].rconst , cfg.Commands[i].iconst , cfg.Commands[i].zoom , cfg.Commands[i].steps);
             case ct_ColVal:
                 ChangeColVal(&state , cfg.Commands[i].colgoal , cfg.Commands[i].steps) ; 
+            case ct_NewColoring:
+                ChangeColoring(&state , cfg.Commands[i].NewcolRC , cfg.Commands[i].NewcolBC , cfg.Commands[i].NewcolGC , cfg.Commands[i].steps) ; 
 
         }
     }

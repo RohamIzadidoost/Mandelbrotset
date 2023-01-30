@@ -88,6 +88,12 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
             Commands[cmdno].cmd = ct_ColVal ;
             fscanf(fp , "%lf%*c%d ", &(Commands[cmdno].colgoal), &(Commands[cmdno].steps));
         }
+        else if (strcmp(cmdname , "ChangeColoring") == 0)
+        {
+            Commands[cmdno].cmd = ct_NewColoring ;
+            fscanf(fp , "%lf%*c%lf%*c%lf%*c%d ", &(Commands[cmdno].NewcolRC) , &(Commands[cmdno].NewcolBC)
+             , &(Commands[cmdno].NewcolGC) ,  &(Commands[cmdno].steps));
+        }
         //printf("Done and cfg type is %d , %d \n " ,strcmp(cmdname, "hold") , strcmp(cmdname, "rotate") ) ; 
         cmdno++;
     }

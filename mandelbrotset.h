@@ -17,7 +17,7 @@ complex mul(complex a , complex b){
     res.I = a.I * b.R + a.R * b.I ; 
     return res ; 
 }
-//printf("I am Sareh");
+
 
 complex sum(complex a , complex b){
     complex res = {a.R + b.R , a.I + b.I} ; 
@@ -53,6 +53,9 @@ double get_mbs_iter(double x, double y)
         z = sum(mul(z , z) , c ) ; 
     }
     if(res == MAX_ITER + 1) return res ; 
+    // printf("res : %d , ABS(z): %lf , log(abs(z)): %lf  , log2: %lf , log(log2): %lf \n " 
+    // , res , ABS(&z) , log(ABS(&z)) , log2(ABS(&z)) , log(log2(ABS(&z)))) ; 
+    //return (double)res - log2(ABS(&z)) * ABS(&z) * ABS(&z) * log(ABS(&z))  ; 
     return (double)res - log(log2(ABS(&z))); //log(log2(abs(z)
 }
 
@@ -87,19 +90,87 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
     int G = (g+m)*255;
     int B = (b+m)*255;
     //printf("RGB : %d , %d , %d \n" , R , G , B) ; 
-    p->b = R ; // why it creates a good pic ?
-    p->b = B ; 
-    p->g = G ; 
+     p->b = R ; // why it creates a good pic ? bbg
+     p->b = B ; 
+     p->g = G ; 
+
+    
+    // p->r = G ;
+    // p->b = G ; 
+    // p->g = G ;  
+    // //p->r = B ; 
+    //lprintf("R %d, G %d , B:%d \n" , R , G , B );
+}
+
+int color_number(float H, float S, float V, COLORINDEX* p)
+{
+    float s = S/100.0;
+    float v = V/100.0;
+    float C = s*v;
+    float X = C*(1-fabs(fmod(H/60.0, 2)-1));
+    float m = v-C;
+    float r,g,b;
+    if(H >= 0 && H < 60){
+        r = C,g = X,b = 0;
+    }
+    else if(H >= 60 && H < 120){
+        r = X,g = C,b = 0;
+    }
+    else if(H >= 120 && H < 180){
+        r = 0,g = C,b = X;
+    }
+    else if(H >= 180 && H < 240){
+        r = 0,g = X,b = C;
+    }
+    else if(H >= 240 && H < 300){
+        r = X,g = 0,b = C;
+    }
+    else{
+        r = C,g = 0,b = X;
+    }
+    int R = (r+m)*255;
+    int G = (g+m)*255;
+    int B = (b+m)*255;
+    return G;
+}
+
+double RC = 1.4 , BC = 0.5 , GC = 0.6 ; // red_const , blue_const , green_const
+
+void do_coloring(int cn , COLORINDEX* p){
+    p -> b = BC * cn ; 
+    p -> r = RC * cn ; 
+    p -> g = GC * cn ; 
+}
+
+void HSV_to_rgb(float H, float S, float V, COLORINDEX* p){
+    printf("Hvalue: %lf\n" , H) ;  
+    return ;
+    if(H < 120){
+        p->b = H/120.0 * 255.0 ;
+    }else if(H < 240){
+        p -> r = (H - 120) / 120.0 * 255.0 ; 
+    }else{
+        p ->g = (H - 240) / 120.0 * 255.0 ; 
+    }
 }
 
 void UpdateImageData(ImageState* state)
 {
+    printf("CREATING pic:%d , Center: %lf,%lf,X: %lf,%lf,Y: %lf,%lf, COlval: %lf,ColGoal: %lf,Colstep: %lf\n" ,
+     state->image_count , state->cx , state->cy,
+    state->minx , state->maxx , state->miny , state->maxy , state -> colval , state->colgoal , state -> colstep);
     if(state -> colgoal != state->colval){
         state->colval += state ->colstep; 
     }
-    printf("CREATING pic:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf , COlval: %lf\n" , state->image_count , state->cx , state->cy,
-    state->minx , state->maxx , state->miny , state->maxy , state -> colval);
-    //printf("UPDING IMAGE DATA %d , %d" , state->width , state->height) ; 
+    if(state -> colBC_goal != BC){
+        BC += state->colBC_step ; 
+    }
+    if(state -> colGC_goal != GC){
+        GC += state->colGC_step ; 
+    }
+    if(state -> colRC_goal != RC){
+        RC += state->colRC_step ; 
+    }
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
@@ -111,29 +182,25 @@ void UpdateImageData(ImageState* state)
             
             double iter = get_mbs_iter(rx , ry);
            // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
-            if(iter == MAX_ITER + 1 || iter <= 2)
+            if(iter == MAX_ITER + 1 )
             state->bmFileData.bmData[y * state->width + x] = 0;
             else 
             state->bmFileData.bmData[y * state->width + x] = iter/MAX_ITER * 256.0;
-            
-           // printf("iter: %lf\n" , iter) ; 
 
-            //printf("iter : %d\n" , iter ) ; 
-           // printf("x : %d , y: %d" , x , y) ; 
-        }
+            //printf("bmData: %d , iter: %lf\n" ,state->bmFileData.bmData[y * state->width + x] , iter ) ; 
+        } 
     }
 
-    // I just set i = 2 fixed later  
     for(int i=0; i<256; i++)
     {
         double hue = (int) ((i / 255)/360);
         hue = (double)(i)/255.0 * 360.0 ; 
-        //printf("%d" , hue) ;
         int H = ((int)hue + 200) % 360 ; 
         int Hint = (int) hue ; 
-        hsv_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
-        //printf("i:%d R:%d , G:%d , B:%d \n" , i , state->bmFileData.bmHeader.colorIdx[i].r , 
-       //state->bmFileData.bmHeader.colorIdx[i].g , state->bmFileData.bmHeader.colorIdx[i].b) ; 
+        // HSV_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
+        // hsv_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
+        int colnumber = color_number(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])) ; 
+        do_coloring(colnumber , &(state->bmFileData.bmHeader.colorIdx[i])) ; 
     }
     state->bmFileData.bmHeader.bmInfoHeader.biClrUsed = 100;
     state->bmFileData.bmHeader.bmInfoHeader.biClrImportant = 100;
@@ -145,7 +212,15 @@ void ChangeColVal(ImageState* state, double goal, int steps)
 {
     state -> colgoal = goal ; 
     state -> colstep = goal - state->colval ; 
-    state -> colstep /= steps ; 
+    state -> colstep /= (double)steps ; 
+}
+void ChangeColoring(ImageState* state, double newRC , double newBC , double newGC , int steps){
+    state -> colBC_goal = newBC ; 
+    state -> colGC_goal = newGC ; 
+    state -> colRC_goal = newRC ;
+    state -> colBC_step = (newBC - BC)/(double)steps; 
+    state -> colGC_step = (newGC - GC)/(double)steps ;
+    state -> colRC_step = (newRC - RC)/(double)steps ;  
 }
 void BuildJulia(ImageState* state, double NewRconst, double NewIconst, int steps)
 {
@@ -189,6 +264,9 @@ void ChangeZoom(ImageState* state, double zoom, int steps)
 }
 void ZoomJul(ImageState* state, double NewRconst, double NewIconst ,double zoom, int steps ){
     printf("ZOOMJULING : %lf , %lf , %lf , %d : \n" , NewRconst , NewIconst , zoom , steps) ; 
+    printf("STATE:%d , Center: %lf , %lf , X: %lf , %lf, Y: %lf , %lf , COlval: %lf , ColGoal: %lf ,Colstep: %lf\n" ,
+     state->image_count , state->cx , state->cy,
+    state->minx , state->maxx , state->miny , state->maxy , state -> colval , state->colgoal , state -> colstep);
     JULIA = 1 ; 
     double Rst = (double)(NewRconst - julia_begin_const.R) / (double)(steps) ; 
     double Ist = (double)(NewIconst - julia_begin_const.I) / (double)(steps) ; 
@@ -209,6 +287,8 @@ void ZoomJul(ImageState* state, double NewRconst, double NewIconst ,double zoom,
         UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
+    printf("STATE:%d ,COlval: %lf , ColGoal: %lf ,Colstep: %lf\n" ,
+     state->image_count , state -> colval , state->colgoal , state -> colstep);
 }
 
 void ChangeCenter(ImageState* state, double newcx, double newcy, int steps)
@@ -250,6 +330,7 @@ void Hold(ImageState* state, int steps)
     for(int i=0; i<steps; i++)
     {
         //TODO
+        UpdateImageData(state);
         WriteBitmapFile(state->image_count++, & state->bmFileData);
     }
 }

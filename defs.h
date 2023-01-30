@@ -10,7 +10,8 @@ typedef enum
     ct_Hold = 4,
     ct_Julia = 5 , 
     ct_ZoomJul = 6,
-    ct_ColVal = 7
+    ct_ColVal = 7 , 
+    ct_NewColoring = 8 , 
 } cmd_type;
 
 
@@ -23,6 +24,7 @@ typedef struct _cmd
     double angle;
     double rconst , iconst ; 
     double colgoal ; 
+    double NewcolRC , NewcolBC , NewcolGC ; 
 } Cmd;
 
 
@@ -45,6 +47,9 @@ typedef struct _image_state
     float colval ;
     float colgoal ; 
     float colstep; 
+    double colBC , colBC_step , colBC_goal; 
+    double colRC , colRC_step , colRC_goal; 
+    double colGC , colGC_step , colGC_goal; 
     BitMapFile bmFileData;
 } ImageState;
 #endif
