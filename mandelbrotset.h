@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-int MAX_ITER = 200; 
+int MAX_ITER = 286; 
 
 typedef struct _complex
 {
@@ -156,21 +156,24 @@ void HSV_to_rgb(float H, float S, float V, COLORINDEX* p){
 
 void UpdateImageData(ImageState* state)
 {
-    printf("CREATING pic:%d , Center: %lf,%lf,X: %lf,%lf,Y: %lf,%lf, COlval: %lf,ColGoal: %lf,Colstep: %lf\n" ,
-     state->image_count , state->cx , state->cy,
-    state->minx , state->maxx , state->miny , state->maxy , state -> colval , state->colgoal , state -> colstep);
+    // printf("CREATING pic:%d , Center: %lf,%lf,X: %lf,%lf,Y: %lf,%lf, COlval: %lf,ColGoal: %lf,Colstep: %lf\n" ,
+    //  state->image_count , state->cx , state->cy,
+    // state->minx , state->maxx , state->miny , state->maxy , state -> colval , state->colgoal , state -> colstep);
     if(state -> colgoal != state->colval){
         state->colval += state ->colstep; 
     }
-    if(state -> colBC_goal != BC){
+    if( fabs(state -> colBC_goal - BC ) > 0.01){
         BC += state->colBC_step ; 
     }
-    if(state -> colGC_goal != GC){
+    if( fabs(state -> colGC_goal - GC ) > 0.01 ){
         GC += state->colGC_step ; 
     }
-    if(state -> colRC_goal != RC){
+    if( fabs(state -> colRC_goal - RC) > 0.01){
         RC += state->colRC_step ; 
     }
+    printf("CREATING pic:%d , Center: %lf,%lf,X: %lf,%lf,Y: %lf,%lf, RC: %lf,BC: %lf,GC: %lf\n" ,
+     state->image_count , state->cx , state->cy,
+    state->minx , state->maxx , state->miny , state->maxy , RC , BC , GC);
     for(int x=0; x<state->width; x++){
         //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
