@@ -4,7 +4,7 @@
 #include"defs.h"
 #include<math.h>
 const double PI=  3.14159265/180.0;
-int MAX_ITER = 286; 
+int MAX_ITER = 320; 
 
 typedef struct _complex
 {
