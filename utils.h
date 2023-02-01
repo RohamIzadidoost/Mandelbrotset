@@ -67,9 +67,7 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
         else if (strcmp(cmdname, "hold") == 0)
         {
             Commands[cmdno].cmd = ct_Hold;
-            
-            //printf("WAS HOLD and %d \n " ,Commands[cmdno].cmd ) ; 
-            
+                        
             fscanf(fp , "%d ", &(Commands[cmdno].steps));
         }
         else if (strcmp(cmdname , "julia") == 0)
@@ -94,7 +92,6 @@ void ProcessArgs(int argc, char** argv, Config* outcfg, ImageState* state)
             fscanf(fp , "%lf%*c%lf%*c%lf%*c%d ", &(Commands[cmdno].NewcolRC) , &(Commands[cmdno].NewcolBC)
              , &(Commands[cmdno].NewcolGC) ,  &(Commands[cmdno].steps));
         }
-        //printf("Done and cfg type is %d , %d \n " ,strcmp(cmdname, "hold") , strcmp(cmdname, "rotate") ) ; 
         cmdno++;
     }
     

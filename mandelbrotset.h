@@ -53,9 +53,7 @@ double get_mbs_iter(double x, double y)
         z = sum(mul(z , z) , c ) ; 
     }
     if(res == MAX_ITER + 1) return res ; 
-    // printf("res : %d , ABS(z): %lf , log(abs(z)): %lf  , log2: %lf , log(log2): %lf \n " 
-    // , res , ABS(&z) , log(ABS(&z)) , log2(ABS(&z)) , log(log2(ABS(&z)))) ; 
-    //return (double)res - log2(ABS(&z)) * ABS(&z) * ABS(&z) * log(ABS(&z))  ; 
+
     return (double)res - log(log2(ABS(&z))); //log(log2(abs(z)
 }
 
@@ -89,17 +87,9 @@ void hsv_to_rgb(float H, float S, float V, COLORINDEX* p)
     int R = (r+m)*255;
     int G = (g+m)*255;
     int B = (b+m)*255;
-    //printf("RGB : %d , %d , %d \n" , R , G , B) ; 
-     p->b = R ; // why it creates a good pic ? bbg
-     p->b = B ; 
-     p->g = G ; 
-
-    
-    // p->r = G ;
-    // p->b = G ; 
-    // p->g = G ;  
-    // //p->r = B ; 
-    //lprintf("R %d, G %d , B:%d \n" , R , G , B );
+    p->r = R ; //bbg
+    p->b = B ; 
+    p->g = G ; 
 }
 
 int color_number(float H, float S, float V, COLORINDEX* p)
@@ -156,9 +146,6 @@ void HSV_to_rgb(float H, float S, float V, COLORINDEX* p){
 
 void UpdateImageData(ImageState* state)
 {
-    // printf("CREATING pic:%d , Center: %lf,%lf,X: %lf,%lf,Y: %lf,%lf, COlval: %lf,ColGoal: %lf,Colstep: %lf\n" ,
-    //  state->image_count , state->cx , state->cy,
-    // state->minx , state->maxx , state->miny , state->maxy , state -> colval , state->colgoal , state -> colstep);
     if(state -> colgoal != state->colval){
         state->colval += state ->colstep; 
     }
@@ -175,7 +162,6 @@ void UpdateImageData(ImageState* state)
      state->image_count , state->cx , state->cy,
     state->minx , state->maxx , state->miny , state->maxy , RC , BC , GC);
     for(int x=0; x<state->width; x++){
-        //printf("%d" , x) ; 
         for(int y=0; y<state->height; y++)
         {
             double nx = (double)state->minx + ((double)x / (double)(state->width) ) * (double)(state->maxx - state->minx)
@@ -184,13 +170,11 @@ void UpdateImageData(ImageState* state)
             double ry = -nx * sin(PI * state->angle) + ny * cos(PI * state->angle); 
             
             double iter = get_mbs_iter(rx , ry);
-           // printf("x:%d , y:%d , iter:%d \n" , rx , ry , iter) ; 
             if(iter == MAX_ITER + 1 )
             state->bmFileData.bmData[y * state->width + x] = 0;
             else 
             state->bmFileData.bmData[y * state->width + x] = iter/MAX_ITER * 256.0;
 
-            //printf("bmData: %d , iter: %lf\n" ,state->bmFileData.bmData[y * state->width + x] , iter ) ; 
         } 
     }
 
@@ -200,8 +184,6 @@ void UpdateImageData(ImageState* state)
         hue = (double)(i)/255.0 * 360.0 ; 
         int H = ((int)hue + 200) % 360 ; 
         int Hint = (int) hue ; 
-        // HSV_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
-        // hsv_to_rgb(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])); 
         int colnumber = color_number(hue , 100 , state->colval , &(state->bmFileData.bmHeader.colorIdx[i])) ; 
         do_coloring(colnumber , &(state->bmFileData.bmHeader.colorIdx[i])) ; 
     }
@@ -247,12 +229,6 @@ void ChangeZoom(ImageState* state, double zoom, int steps)
     printf("ZST : %lf\n" , zst) ; 
     for(int i=0; i<steps; i++)
     {
-        // state->minx = state->minx / zst ;  
-        // state->miny = state->miny / zst ; 
-        // state->maxx = state->maxx / zst ; 
-        // state->maxy = state->maxy / zst ; 
-        // state->cx = state->cx / zst ; 
-        // state->cy = state->cy / zst ; 
         double flx = state->maxx - state->minx ; //first len x 
         double fly = state->maxy - state->miny ; 
         double dx = flx - flx / zst; // delta x
